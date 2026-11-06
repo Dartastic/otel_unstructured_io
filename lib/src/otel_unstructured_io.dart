@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_unstructured_io_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_unstructured_io';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class UnstructuredIoResult {
+  /// Creates a result.
   const UnstructuredIoResult({
     this.serverlessTier,
     this.filename,
@@ -82,8 +83,13 @@ class UnstructuredIoResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class UnstructuredIoCallResult<T> {
+  /// Creates a call result.
   const UnstructuredIoCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final UnstructuredIoResult? result;
 }
@@ -109,110 +115,110 @@ Future<T> tracedUnstructuredIo<T>({
   final span = _tracer().startSpan(
     'unstructured_io $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.serverlessTier != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.tier',
           r.result!.serverlessTier!,
         ));
       }
       if (r.result!.filename != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.filename',
           r.result!.filename!,
         ));
       }
       if (r.result!.mimeType != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.mime_type',
           r.result!.mimeType!,
         ));
       }
       if (r.result!.fileSizeBytes != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.file.size_bytes',
           r.result!.fileSizeBytes!,
         ));
       }
       if (r.result!.strategy != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.strategy',
           r.result!.strategy!,
         ));
       }
       if (r.result!.pdfInferTableStructure != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'unstructured_io.pdf.infer_table_structure',
           r.result!.pdfInferTableStructure!,
         ));
       }
       if (r.result!.languages != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.languages',
           r.result!.languages!,
         ));
       }
       if (r.result!.chunkingStrategy != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.chunking.strategy',
           r.result!.chunkingStrategy!,
         ));
       }
       if (r.result!.maxCharacters != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.chunking.max_characters',
           r.result!.maxCharacters!,
         ));
       }
       if (r.result!.overlap != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.chunking.overlap',
           r.result!.overlap!,
         ));
       }
       if (r.result!.pagesProcessed != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.pages.processed',
           r.result!.pagesProcessed!,
         ));
       }
       if (r.result!.elementsReturned != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.elements.returned',
           r.result!.elementsReturned!,
         ));
       }
       if (r.result!.tableElements != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.elements.tables',
           r.result!.tableElements!,
         ));
       }
       if (r.result!.imageElements != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'unstructured_io.elements.images',
           r.result!.imageElements!,
         ));
       }
       if (r.result!.workflowId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.workflow.id',
           r.result!.workflowId!,
         ));
       }
       if (r.result!.jobId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.job.id',
           r.result!.jobId!,
         ));
       }
       if (r.result!.jobStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'unstructured_io.job.status',
           r.result!.jobStatus!,
         ));
@@ -224,7 +230,7 @@ Future<T> tracedUnstructuredIo<T>({
         }
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -235,13 +241,13 @@ Future<T> tracedUnstructuredIo<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
